@@ -12,7 +12,7 @@
 --|
 --| FILENAME      : thunderbird_fsm_tb.vhd (TEST BENCH)
 --| AUTHOR(S)     : Capt Phillip Warner, C3C Ty Hubert
---| CREATED       : 03/2017
+--| CREATED       : 03/2017 Last modified: 03/21/2024
 --| DESCRIPTION   : This file tests the thunderbird_fsm modules.
 --|
 --|
@@ -56,6 +56,7 @@ end thunderbird_fsm_tb;
 
 architecture test_bench of thunderbird_fsm_tb is 
 	
+	-- component declaration for the Unit Under Test (UUT)
 	component thunderbird_fsm is 
 	  port(
          i_clk, i_reset  : in std_logic;
@@ -71,12 +72,13 @@ architecture test_bench of thunderbird_fsm_tb is
 	signal w_reset : std_logic := '0';
 	signal w_right : std_logic := '0';
 	signal w_left : std_logic := '0';
+	
 	--Outputs
 	signal w_lights_L : std_logic_vector(2 downto 0) := "000";
 	signal w_lights_R : std_logic_vector(2 downto 0) := "000";
 	
-	-- constants
-	constant k_clk_period : time := 10 ns;
+	-- Constants
+	constant k_clk_period : time := 10 ns; --Clock period definition
 	
 begin
 	-- PORT MAPS ----------------------------------------
@@ -104,7 +106,7 @@ begin
 	
 	-- Test Plan Process --------------------------------
 	
-	-- Use 220 ns for simulation
+	-- 220 ns for simulation
 	sim_proc: process
 	begin
 	   -- sequential timing
