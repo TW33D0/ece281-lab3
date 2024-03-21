@@ -12,7 +12,7 @@
 --|
 --| FILENAME      : thunderbird_fsm.vhd
 --| AUTHOR(S)     : Capt Phillip Warner, Capt Dan Johnson, C3C Ty Hubert
---| CREATED       : 03/2017 Last modified 03/15/2024
+--| CREATED       : 03/2017 Last modified 03/21/2024
 --| DESCRIPTION   : This file implements the ECE 281 Lab 2 Thunderbird tail lights
 --|					FSM using enumerated types.  This was used to create the
 --|					erroneous sim for GR1
@@ -86,17 +86,17 @@ library ieee;
   use ieee.numeric_std.all;
  
 entity thunderbird_fsm is 
-  port(
-	i_clk, i_reset  : in std_logic;
-	i_left, i_right : in std_logic;
-	o_lights_L      : out   std_logic_vector(2 downto 0);
-    o_lights_R      : out   std_logic_vector(2 downto 0)
+  port( i_clk, i_reset  : in std_logic;
+	    i_left, i_right : in std_logic;
+	    o_lights_L      : out   std_logic_vector(2 downto 0);
+        o_lights_R      : out   std_logic_vector(2 downto 0)
   );
 end thunderbird_fsm;
 
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
 -- CONSTANTS ------------------------------------------------------------------
+    -- signals with the default state off (000)
     signal f_S : std_logic_vector(2 downto 0) := "000";
     signal f_S_next : std_logic_vector(2 downto 0) := "000";
      
@@ -131,7 +131,7 @@ begin
     -- state memory w/ asynchronous reset -------------------------------------------
     register_proc : process (i_clk, i_reset)
     begin
-            --Reset state is empty
+            --Reset state is off
         if i_reset = '1' then
             f_S <= "000";
         elsif (rising_edge(i_clk)) then
