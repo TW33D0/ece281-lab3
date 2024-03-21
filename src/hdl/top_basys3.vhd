@@ -11,8 +11,8 @@
 --| ---------------------------------------------------------------------------
 --|
 --| FILENAME      : top_basys3.vhd
---| AUTHOR(S)     : Capt Phillip Warner
---| CREATED       : 02/22/2018
+--| AUTHOR(S)     : Capt Phillip Warner & C3C Ty Hubert
+--| CREATED       : 02/22/2018 Last Modified: 03/21/2024
 --| DESCRIPTION   : This file implements the top level module for a BASYS 3 to 
 --|					drive a Thunderbird taillight controller FSM.
 --|
@@ -60,20 +60,15 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
 
-
 entity top_basys3 is
 	port(
-
-		clk     :   in std_logic; -- native 100MHz FPGA clock
-		
+		clk     :   in std_logic; -- native 100MHz FPGA clock	
 		-- Switches (16 total)
 		sw  	:   in std_logic_vector(15 downto 0); -- sw(15) = left; sw(0) = right
-
 		-- LEDs (16 total)
 		-- taillights (LC, LB, LA, RA, RB, RC)
 		led 	:   out std_logic_vector(15 downto 0);  -- led(15:13) --> L
                                                         -- led(2:0)   --> R
-		
 		-- Buttons (5 total)
 		--btnC	:	in	std_logic
 		--btnU	:	in	std_logic;
@@ -85,8 +80,9 @@ end top_basys3;
 
 architecture top_basys3_arch of top_basys3 is 
   
-	-- declare components
-component thunderbird_fsm is
+--declare components
+	--Declare thunderbird component 
+component thunderbird_fsm is 
     port( i_clk, i_reset  : in std_logic;
           i_left, i_right : in std_logic;
           o_lights_L      : out   std_logic_vector(2 downto 0);
@@ -94,9 +90,10 @@ component thunderbird_fsm is
     );
 end component thunderbird_fsm;
 
+    --Declare clock divider component
 component clock_divider is
 	generic ( constant k_DIV : natural := 2	);									   -- number (e.g., k_DIV := 2 --> clock divider of 4)
-	port ( 	i_clk    : in std_logic;
+	port ( 	i_clk    : in std_logic;           -- basys3 clk
 			i_reset  : in std_logic;		   -- asynchronous
 			o_clk    : out std_logic		   -- divided (slow) clock
 	);
@@ -113,31 +110,29 @@ begin
         i_reset => btnR,
         i_left => sw(15),
         i_right => sw(0),
-        o_lights_L(0) => led(13),
+        o_lights_L(0) => led(13),       -- LSB towards the center of Basys3 Board
         o_lights_L(1) => led(14),
-        o_lights_L(2) => led(15),
-        o_lights_R(0) => led(2),
+        o_lights_L(2) => led(15),       --MSB at the edge of Basys3 Board
+        o_lights_R(0) => led(2),        -- LSB towards the center of Basys3 Board
         o_lights_R(1) => led(1),
-        o_lights_r(2) => led(0)
+        o_lights_r(2) => led(0)         --MSB at the edge of Basys3 Board
      );
-	   
 	 --port map for clock_divider 
-	 clkdiv_inst : clock_divider
-	   generic map ( k_DIV => 12500000 ) -- 4 Hz clock from 100 MHz
-	   port map (
+	 clkdiv_inst : clock_divider         -- clock = 100 MHz / (2*k_DIV)
+	   generic map ( k_DIV => 12500000 ) -- k_DIV = 50 MHz / clock   
+	   port map (                        -- 4 Hz clock from 100 MHz
 	       i_clk => clk,
 	       i_reset => btnL,
 	       o_clk => w_clk
 	   );
-
+	   
 	-- CONCURRENT STATEMENTS ----------------------------
 	
 	-- ground unused LEDs
+	led(12 downto 3) <= (others => '0');
+	
 	-- leave unused switches UNCONNECTED
 	
 	-- Ignore the warnings associated with these signals
-	-- Alternatively, you can create a different board implementation, 
-	--   or make additional adjustments to the constraints file
-	led(12 downto 3) <= (others => '0');
 	
 end top_basys3_arch;
